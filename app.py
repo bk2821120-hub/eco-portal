@@ -16,7 +16,7 @@ import requests
 socket.setdefaulttimeout(10)
 logging.basicConfig(level=logging.DEBUG)
 
-app = Flask(__name__, static_url_path='/static', static_folder='static', template_folder='templates')
+app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-key-for-dev')
 # Use absolute path for database to avoid issues in production
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -40,6 +40,8 @@ def debug_info():
     return {
         "cwd": os.getcwd(),
         "instance_exists": os.path.exists('instance'),
+        "templates_exists": os.path.exists('templates'),
+        "templates_content": os.listdir('templates') if os.path.exists('templates') else [],
         "db_uri": app.config['SQLALCHEMY_DATABASE_URI']
     }
 
