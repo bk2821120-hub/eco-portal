@@ -16,7 +16,10 @@ import requests
 socket.setdefaulttimeout(10)
 logging.basicConfig(level=logging.DEBUG)
 
-app = Flask(__name__)
+# Use absolute paths for templates and static files to ensure Render finds them correctly
+template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
+static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))
+app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-key-for-dev')
 # Use absolute path for database to avoid issues in production
 basedir = os.path.abspath(os.path.dirname(__file__))
