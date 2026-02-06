@@ -9,106 +9,169 @@
 </section>
 
 <section class="news-container">
-    <div class="news-grid professional-feed">
+    <div class="educational-feed">
         {% for item in news %}
-        <article class="news-card professional-item">
-            <div class="news-content">
-                <div class="news-meta">
-                    <span class="news-category tag-{{ item.category|lower }}">{{ item.category }}</span>
-                    <span class="news-location"><i class="fas fa-map-marker-alt"></i> {{ item.location }}</span>
-                    <span class="news-date"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
+        <article class="educational-item">
+            <header class="educational-header">
+                <div class="header-top">
+                    <span class="category-pill">{{ item.category }}</span>
+                    <span class="location-label"><i class="fas fa-globe"></i> {{ item.location }}</span>
+                    <span class="date-label">{{ item.date }}</span>
+                </div>
+                <h2 class="educational-title">{{ item.title }}</h2>
+            </header>
+
+            <div class="educational-content">
+                <div class="content-section intro">
+                    <h3><i class="fas fa-info-circle"></i> Introduction</h3>
+                    <p>{{ item.intro }}</p>
                 </div>
 
-                <h2 class="professional-title">{{ item.title }}</h2>
-                <p class="professional-summary"><strong>Summary:</strong> {{ item.short_summary }}</p>
-
-                <div class="detailed-content">
-                    {{ item.detailed_content }}
+                <div class="content-section explanation">
+                    <h3><i class="fas fa-book-open"></i> Why It Matters</h3>
+                    <p>{{ item.explanation }}</p>
                 </div>
 
-                <div class="editor-badge">
-                    <i class="fas fa-check-circle"></i> Verified by EcoPortal Editor
+                <div class="content-section impact">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Impact</h3>
+                    <p>{{ item.impact }}</p>
+                </div>
+
+                <div class="content-section awareness">
+                    <h3><i class="fas fa-lightbulb"></i> What You Can Do</h3>
+                    <p>{{ item.awareness }}</p>
+                </div>
+
+                <div class="content-section conclusion">
+                    <h3><i class="fas fa-seedling"></i> Conclusion</h3>
+                    <p>{{ item.conclusion }}</p>
                 </div>
             </div>
+
+            <footer class="educational-footer">
+                <div class="verified-badge">
+                    <i class="fas fa-user-graduate"></i> Curated for EcoPortal Students
+                </div>
+            </footer>
         </article>
         {% endfor %}
     </div>
 </section>
 
 <style>
-    .professional-feed {
+    .educational-feed {
         max-width: 900px;
         margin: 0 auto;
+        padding: 2rem 1rem;
         display: flex;
         flex-direction: column;
-        gap: 3rem;
+        gap: 4rem;
     }
 
-    .professional-item {
-        border-left: 5px solid var(--primary-color);
+    .educational-item {
         background: var(--white);
-        padding: 2.5rem;
-        transition: transform 0.3s ease;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
     }
 
-    .news-meta {
+    .educational-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .educational-header {
+        padding: 2rem;
+        background: linear-gradient(to right, #f8fdf8, #ffffff);
+        border-bottom: 2px solid var(--background-color);
+    }
+
+    .header-top {
         display: flex;
         gap: 1.5rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
         font-size: 0.85rem;
         color: var(--text-light);
         align-items: center;
     }
 
-    .tag-climate {
-        background: #e3f2fd;
-        color: #1565c0;
-        padding: 2px 10px;
-        border-radius: 4px;
-    }
-
-    .tag-pollution {
-        background: #fbe9e7;
-        color: #d84315;
-        padding: 2px 10px;
-        border-radius: 4px;
-    }
-
-    .tag-global {
-        background: #e8f5e9;
-        color: #2e7d32;
-        padding: 2px 10px;
-        border-radius: 4px;
-    }
-
-    .professional-title {
-        font-size: 1.8rem;
-        color: var(--primary-dark);
-        margin-bottom: 1.5rem;
-    }
-
-    .professional-summary {
-        font-style: italic;
-        color: #555;
-        margin-bottom: 1.5rem;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 1rem;
-    }
-
-    .detailed-content {
-        line-height: 1.8;
-        font-size: 1.05rem;
-        color: #333;
-    }
-
-    .editor-badge {
-        margin-top: 2rem;
-        font-size: 0.8rem;
-        color: var(--primary-color);
+    .category-pill {
+        background: var(--primary-color);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
         font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .educational-title {
+        font-size: 2.2rem;
+        color: var(--primary-dark);
+        line-height: 1.3;
+        font-weight: 800;
+    }
+
+    .educational-content {
+        padding: 2.5rem;
+        display: grid;
+        gap: 2.5rem;
+    }
+
+    .content-section h3 {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .content-section p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #444;
+    }
+
+    .content-section.intro p {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .content-section.awareness {
+        background: #f1f8e9;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 4px solid var(--primary-light);
+    }
+
+    .educational-footer {
+        padding: 1.5rem 2.5rem;
+        background: #f9f9f9;
+        border-top: 1px solid #eee;
+    }
+
+    .verified-badge {
+        font-size: 0.85rem;
+        color: var(--primary-color);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    @media (max-width: 768px) {
+        .educational-title {
+            font-size: 1.6rem;
+        }
+
+        .educational-content {
+            padding: 1.5rem;
+        }
     }
 </style>
 {% endblock %}
