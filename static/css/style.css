@@ -1,16 +1,18 @@
 :root {
-    --primary-color: #1b5e20;
-    --primary-light: #4c8c4a;
-    --primary-dark: #003308;
-    --secondary-color: #00acc1;
+    --primary-color: #7ab51d;
+    /* Lime green from your logo */
+    --secondary-color: #006eb4;
+    /* Deep blue from your logo */
+    --primary-light: #a4d000;
+    --primary-dark: #5a8a15;
     --accent-color: #cddc39;
     --background-color: #f7fafc;
     --white: #ffffff;
     --text-dark: #2d3436;
     --text-light: #636e72;
-    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --glass-bg: rgba(255, 255, 255, 0.7);
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.85);
     --border-radius: 16px;
     --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
