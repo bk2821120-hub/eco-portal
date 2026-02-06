@@ -21,6 +21,7 @@
 
 <section class="news-container">
     <div class="educational-feed">
+        {% if news %}
         {% for item in news %}
         <article class="educational-item">
             <header class="educational-header">
@@ -66,6 +67,13 @@
             </footer>
         </article>
         {% endfor %}
+        {% else %}
+        <div class="no-news">
+            <i class="fas fa-search-minus"></i>
+            <h2>No specific news found for this topic.</h2>
+            <p>Try searching with broader environmental keywords like "Climate", "India Pollution", or "Wildlife".</p>
+        </div>
+        {% endif %}
     </div>
 </section>
 
@@ -173,6 +181,30 @@
         display: flex;
         align-items: center;
         gap: 8px;
+    }
+
+    .no-news {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+    }
+
+    .no-news i {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+
+    .no-news h2 {
+        color: var(--primary-dark);
+        margin-bottom: 1rem;
+    }
+
+    .no-news p {
+        color: var(--text-light);
     }
 
     @media (max-width: 768px) {

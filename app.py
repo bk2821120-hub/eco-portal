@@ -92,12 +92,6 @@ def login():
             
     return render_template('login.html')
 
-import csv
-import os
-from datetime import datetime
-
-# ... (Imports)
-
 # Local "Sheet" Setup (CSV)
 def add_user_to_sheet(full_name, email, username):
     file_exists = os.path.isfile('user_records.csv')
@@ -230,6 +224,7 @@ def news():
                         'explanation': edu['exp'],
                         'impact': edu['impact'],
                         'awareness': edu['tip'],
+                        'conclusion': "Together, stay informed and take small steps toward a cleaner environment.",
                         'date': datetime.now().strftime("%d %B %Y"),
                         'location': 'India' if 'India' in entry.title or 'india' in entry.title.lower() else 'Global'
                     })
@@ -238,6 +233,20 @@ def news():
                 app.logger.warning(f"Feed error {response.status_code} for {url}")
         except Exception as e:
             app.logger.error(f"News Fetch Error for {url}: {e}")
+            
+    # Final Fallback if source is completely unavailable
+    if not educational_news:
+        educational_news.append({
+            'title': "Welcome to EcoPortal Educator",
+            'category': "Announcement",
+            'intro': "We are currently updating our elite news feeds from The Hindu, NatGeo, and NASA.",
+            'explanation': "EcoPortal Educator pulls real-time data from top environmental sources to provide student-friendly summaries.",
+            'impact': "Our goal is to keep you informed about global policies and local issues without jargon.",
+            'awareness': "While we refresh the feeds, you can use the search bar above to explore specific topics.",
+            'conclusion': "Check back in a few minutes for the latest updates.",
+            'date': datetime.now().strftime("%d %B %Y"),
+            'location': "India"
+        })
             
     return render_template('news.html', news=educational_news, search_query=query)
 
