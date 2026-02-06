@@ -9,6 +9,10 @@ import logging
 import feedparser
 import re
 import csv
+import socket
+
+# Set global timeout for socket operations (like feed fetching)
+socket.setdefaulttimeout(15)
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__, static_url_path='/static', static_folder='static', template_folder='templates')
@@ -195,12 +199,23 @@ def news():
         }
     }
 
+    # Fetch news with custom User-Agent to avoid blocking
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+    
     for url, category in feeds:
         try:
-            feed = feedparser.parse(url)
+            # We use feedparser directly but the global socket timeout handles hangs
+            feed = feedparser.parse(url, agent=headers['User-Agent'])
+            
+            if feed.bozo:
+                app.logger.warning(f"Feed parser bozo error for {url}: {feed.bozo_exception}")
+
             # Take top 3 for search, or top 2 for default feeds
             limit = 3 if query else 2
-            for entry in feed.entries[:limit]:
+            count = 0
+            for entry in feed.entries:
+                if count >= limit: break
+                
                 summary = entry.summary if 'summary' in entry else ""
                 raw_text = re.sub('<[^<]+?>', '', summary) if summary else entry.title
                 
@@ -210,7 +225,7 @@ def news():
 
                 educational_news.append({
                     'title': entry.title,
-                    'category': category,
+                    'category': category_key,
                     'intro': raw_text[:200] + "...",
                     'explanation': edu['exp'],
                     'impact': edu['impact'],
@@ -218,8 +233,9 @@ def news():
                     'date': datetime.now().strftime("%d %B %Y"),
                     'location': 'India' if 'India' in entry.title or 'india' in entry.title.lower() else 'Global'
                 })
+                count += 1
         except Exception as e:
-            app.logger.error(f"Search/Feed Error: {e}")
+            app.logger.error(f"Search/Feed Error for {url}: {e}")
             
     return render_template('news.html', news=educational_news, search_query=query)
 
