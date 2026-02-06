@@ -8,6 +8,17 @@
     <p>Stay updated with what's happening around our planet.</p>
 </section>
 
+<section class="search-container">
+    <form action="{{ url_for('news') }}" method="GET" class="search-form">
+        <div class="search-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" name="q" placeholder="Search topics (e.g. Climate, India Pollution, Wildlife...)"
+                value="{{ search_query }}">
+            <button type="submit" class="btn-search">Search News</button>
+        </div>
+    </form>
+</section>
+
 <section class="news-container">
     <div class="educational-feed">
         {% for item in news %}

@@ -153,83 +153,75 @@ def logout():
 
 @app.route('/news')
 def news():
-    # Elite Educational Sources for EcoPortal
-    feeds = [
-        ("https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", "Climate Change"),
-        ("https://www.sciencedaily.com/rss/earth_climate/environmental_science.xml", "Green Tech"),
-        ("https://news.google.com/rss/search?q=pollution+awareness+india&hl=en-IN&gl=IN&ceid=IN:en", "Pollution"),
-        ("https://news.google.com/rss/search?q=wildlife+conservation+India&hl=en-IN&gl=IN&ceid=IN:en", "Wildlife")
-    ]
+    query = request.args.get('q', '')
+    
+    # Base feeds + dynamic search if query exists
+    if query:
+        # Search-specific feed using Google News RSS
+        search_query = f"{query} environment climate sustainability India"
+        feeds = [(f"https://news.google.com/rss/search?q={search_query}&hl=en-IN&gl=IN&ceid=IN:en", "Search Result")]
+    else:
+        # Default elite sources
+        feeds = [
+            ("https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", "Climate Change"),
+            ("https://www.sciencedaily.com/rss/earth_climate/environmental_science.xml", "Green Tech"),
+            ("https://news.google.com/rss/search?q=pollution+awareness+india&hl=en-IN&gl=IN&ceid=IN:en", "India Environment"),
+            ("https://news.google.com/rss/search?q=wildlife+conservation+India&hl=en-IN&gl=IN&ceid=IN:en", "Wildlife")
+        ]
     
     educational_news = []
     
-    # Category-based learning data
+    # Category-based learning database for educational expansion
     learning_repo = {
         "Climate Change": {
-            "exp": "Climate change is caused by the increase of greenhouse gases like CO2 in our atmosphere, which trap heat and warm the planet. This leads to melting ice caps and rising sea levels.",
-            "impact": "Global warming disrupts weather patterns, causing extreme heatwaves, floods, and droughts that threaten food security and human health.",
-            "tip": "Reduce your carbon footprint by using public transport, saving electricity, and planting local trees."
+            "exp": "Climate change refers to long-term shifts in temperatures and weather patterns. Human activities, primarily the burning of fossil fuels, have been the main driver of these changes since the 1800s.",
+            "impact": "The consequences of climate change now include intense droughts, water scarcity, severe fires, rising sea levels, flooding, melting polar ice, catastrophic storms and declining biodiversity.",
+            "tip": "Sustainable solutions include shifting to renewable energy, improving energy efficiency, and protecting forests through reforestation."
         },
         "Pollution": {
-            "exp": "Pollution occurs when harmful substances (pollutants) are introduced into our environment. This can affect the air we breathe, the water we drink, and the soil where we grow food.",
-            "impact": "Pollution causes respiratory diseases in humans and destroys aquatic life. Plastic waste in oceans takes hundreds of years to decompose.",
-            "tip": "Say no to single-use plastics, dispose of electronic waste properly, and support 'Swachh Bharat' initiatives."
-        },
-        "Wildlife": {
-            "exp": "Wildlife conservation is the practice of protecting animal species and their habitats. Biodiversity is essential for a healthy and balanced ecosystem.",
-            "impact": "Loss of species can lead to ecosystem collapse, affecting everything from pollination of crops to natural pest control.",
-            "tip": "Avoid products made from endangered animals, support local wildlife sanctuaries, and keep your surroundings eco-friendly."
+            "exp": "Pollution is the introduction of contaminants into the natural environment that cause adverse change. It can take the form of chemical substances or energy, such as noise, heat or light.",
+            "impact": "Pollution harms human health, causes global warming through greenhouse gases, and leads to the acidification of oceans and soil degradation.",
+            "tip": "Practice the 3R's: Reduce, Reuse, and Recycle. Avoid plastics and support local pollution monitoring initiatives."
         },
         "Green Tech": {
-            "exp": "Green technology involves using science and technology to create products and services that are environmentally friendly and sustainable.",
-            "impact": "Switching to solar and wind energy reduces our dependence on fossil fuels, significantly cutting down on air pollution and carbon emissions.",
-            "tip": "Switch to LED bulbs at home, use solar water heaters, and choose energy-efficient appliances."
+            "exp": "Green technology, also known as clean technology, refers to products, equipment or systems used to conserve the natural environment and resources, which minimize and reduce the negative impact of human activities.",
+            "impact": "It provides sustainable energy solutions (solar, wind), reduces waste, and improves efficiency in transportation and agriculture.",
+            "tip": "Support companies that use green manufacturing and invest in energy-efficient technology for your home."
+        },
+        "India Environment": {
+            "exp": "India faces unique environmental challenges due to its large population and diverse geography. Major issues include air pollution in cities and management of river ecosystems like the Ganga.",
+            "impact": "Environmental health in India directly impacts agriculture, monsoon patterns, and the health of millions of citizens.",
+            "tip": "Local action is vital. Participate in community cleaning drives and follow NGT (National Green Tribunal) guidelines."
         }
     }
 
     for url, category in feeds:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:2]:
+            # Take top 3 for search, or top 2 for default feeds
+            limit = 3 if query else 2
+            for entry in feed.entries[:limit]:
                 summary = entry.summary if 'summary' in entry else ""
                 raw_text = re.sub('<[^<]+?>', '', summary) if summary else entry.title
                 
-                # Fetch category data or use default
-                edu = learning_repo.get(category, {
-                    "exp": "This environmental update highlights the ongoing shifts in our planetary boundaries.",
-                    "impact": "Changes in our environment affect ecological stability and community health.",
-                    "tip": "Stay informed and participate in local environmental awareness programs."
-                })
+                # Dynamic Logic to choose best educational content
+                category_key = category if category in learning_repo else ("Climate Change" if "climate" in entry.title.lower() else "India Environment")
+                edu = learning_repo.get(category_key, learning_repo["Climate Change"])
 
                 educational_news.append({
                     'title': entry.title,
-                    'intro': raw_text[:250] + "...",
+                    'category': category,
+                    'intro': raw_text[:200] + "...",
                     'explanation': edu['exp'],
                     'impact': edu['impact'],
                     'awareness': edu['tip'],
-                    'conclusion': "Together, stay informed and act responsibly for a sustainable future.",
-                    'category': category,
                     'date': datetime.now().strftime("%d %B %Y"),
-                    'location': 'India' if 'India' in entry.title or 'India' in raw_text else 'International'
+                    'location': 'India' if 'India' in entry.title or 'india' in entry.title.lower() else 'Global'
                 })
         except Exception as e:
-            app.logger.error(f"Educational Feed Error for {url}: {e}")
+            app.logger.error(f"Search/Feed Error: {e}")
             
-    # Fallback if feeds fail
-    if not educational_news:
-        educational_news.append({
-            'title': "Welcome to EcoPortal Education",
-            'intro': "We are currently updating our daily news feed. Please check back in a few minutes.",
-            'explanation': "EcoPortal aims to provide students with updated knowledge about climate action.",
-            'impact': "Environmental literacy is the foundation of a sustainable lifestyle.",
-            'awareness': "Explore our other sections like 'Report Issue' to help your local community.",
-            'conclusion': "Every small action for nature counts.",
-            'category': "Awareness",
-            'date': datetime.now().strftime("%d %B %Y"),
-            'location': "Global"
-        })
-            
-    return render_template('news.html', news=educational_news)
+    return render_template('news.html', news=educational_news, search_query=query)
 
 @app.route('/news/<int:news_id>')
 def news_detail(news_id):
