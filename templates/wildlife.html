@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% block title %}Wildlife Protection - EcoPortal{% endblock %}
+
+{% block content %}
+<section class="page-header" style="background: linear-gradient(135deg, #f09819, #edde5d); color: #4e342e;">
+    <h1>Wildlife Conservation Tracker</h1>
+    <p>Monitoring global biodiversity and protecting endangered species.</p>
+</section>
+
+<div class="dashboard-container">
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #d35400; background: #fae5d3;"><i class="fas fa-paw"></i></div>
+            <div class="stat-info">
+                <h3 id="label-species">Regional Species</h3>
+                <p class="stat-value" id="val-species">Loading...</p>
+                <span class="stat-meta" id="meta-species">At Risk Locally</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #27ae60; background: #d5f5e3;"><i class="fas fa-tree"></i></div>
+            <div class="stat-info">
+                <h3 id="label-forest">Local Green Cover</h3>
+                <p class="stat-value" id="val-forest">--%</p>
+                <span class="stat-meta" id="meta-forest">In your region</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #2980b9; background: #d4e6f1;"><i class="fas fa-water"></i></div>
+            <div class="stat-info">
+                <h3 id="label-protected">Protected Areas</h3>
+                <p class="stat-value" id="val-protected">--</p>
+                <span class="stat-meta" id="meta-protected">Sanctuaries nearby</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #8e44ad; background: #ebdef0;"><i class="fas fa-dove"></i></div>
+            <div class="stat-info">
+                <h3 id="label-bird">Local Birdlife</h3>
+                <p class="stat-value" id="val-bird">--</p>
+                <span class="stat-meta" id="meta-bird">Native Species</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Banner -->
+    <div id="location-banner"
+        style="background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 10px; text-align: center; margin-bottom: 2rem; display: none;">
+        <p><i class="fas fa-compass" style="color: #27ae60;"></i> Monitoring biodiversity in <strong
+                id="detected-location">...</strong></p>
+    </div>
+
+    <!-- Charts and Info -->
+    <div class="content-grid">
+        <div class="chart-box">
+            <h3>Regional Conservation Status</h3>
+            <canvas id="speciesChart"></canvas>
+        </div>
+
+        <div class="spotlight-box">
+            <h3><i class="fas fa-star"></i> Regional Species Spotlight</h3>
+            <div class="species-card" id="species-spotlight">
+                <img id="species-img"
+                    src="https://images.unsplash.com/photo-1549480017-d76466a4b7e8?q=80&w=600&auto=format&fit=crop"
+                    alt="Wildlife">
+                <div class="species-info">
+                    <h4 id="species-name">Local Wildlife</h4>
+                    <span class="badge danger">Vulnerable</span>
+                    <p id="species-desc">Discovering native species in your area...</p>
+                    <a href="#" class="btn-micro">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Section -->
+    <section class="gallery">
+        <h2>Protected Habitats</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item"
+                style="background-image: url('https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=600');">
+                <span>Rainforests</span>
+            </div>
+            <div class="gallery-item"
+                style="background-image: url('https://images.unsplash.com/photo-1546514355-7fdc90ccbd06?q=80&w=600');">
+                <span>Coral Reefs</span>
+            </div>
+            <div class="gallery-item"
+                style="background-image: url('https://images.unsplash.com/photo-1445964047600-cdbdb873673d?q=80&w=600');">
+                <span>Savannas</span>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Chart
+        const ctxSpecies = document.getElementById('speciesChart').getContext('2d');
+        const speciesChart = new Chart(ctxSpecies, {
+            type: 'pie',
+            data: {
+                labels: ['Least Concern', 'Near Threatened', 'Vulnerable', 'Endangered', 'Critically Endangered'],
+                datasets: [{
+                    data: [50, 15, 12, 16, 7], // Default global
+                    backgroundColor: ['#81c784', '#aed581', '#fff176', '#ffb74d', '#e57373'],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'right' } } }
+        });
+
+        // Species Database (Simple Mock)
+        const speciesDB = {
+            'North America': { count: 320, name: 'Bald Eagle', img: 'https://images.unsplash.com/photo-1579389146522-777c08799f94?q=80&w=600', risk: 'Least Concern', desc: 'Symbol of strength, recovering well from endangerment in the region.' },
+            'South America': { count: 850, name: 'Jaguar', img: 'https://images.unsplash.com/photo-1582239420556-3c0903328cbd?q=80&w=600', risk: 'Near Threatened', desc: 'The largest cat species in the Americas, facing habitat fragmentation.' },
+            'Europe': { count: 150, name: 'Eurasian Wolf', img: 'https://images.unsplash.com/photo-1543169123-22874136656c?q=80&w=600', risk: 'Least Concern', desc: 'Returning to many parts of Europe due to conservation efforts.' },
+            'Africa': { count: 600, name: 'African Elephant', img: 'https://images.unsplash.com/photo-1557431177-36141475cdd6?q=80&w=600', risk: 'Endangered', desc: 'Iconic giants threatened by poaching and habitat loss across the savanna.' },
+            'Asia': { count: 540, name: 'Bengal Tiger', img: 'https://images.unsplash.com/photo-1549480017-d76466a4b7e8?q=80&w=600', risk: 'Endangered', desc: 'Top predators of the jungle, crucial for maintaining ecological balance.' },
+            'Oceania': { count: 210, name: 'Koala', img: 'https://images.unsplash.com/photo-1540316315576-96a17b075489?q=80&w=600', risk: 'Vulnerable', desc: 'Native marsupials facing severe threats from bushfires and habitat loss.' },
+            'Default': { count: 41000, name: 'Snow Leopard', img: 'https://images.unsplash.com/photo-1520627702758-155891399d86?q=80&w=600', risk: 'Vulnerable', desc: 'Elusive cats of the high mountains, rarely seen and highly protected.' }
+        };
+
+        // Fetch Location
+        fetch('https://ipapi.co/json/')
+            .then(res => res.json())
+            .then(data => {
+                const city = data.city || 'Your Area';
+                const region = data.continent_code; // NA, SA, EU, AF, AS, OC
+                const country = data.country_name || 'your country';
+
+                // Location UI
+                document.getElementById('detected-location').textContent = `${city}, ${country}`;
+                document.getElementById('location-banner').style.display = 'block';
+
+                // Map Continent Code to Key
+                let continentKey = 'Default';
+                if (region === 'NA') continentKey = 'North America';
+                if (region === 'SA') continentKey = 'South America';
+                if (region === 'EU') continentKey = 'Europe';
+                if (region === 'AF') continentKey = 'Africa';
+                if (region === 'AS') continentKey = 'Asia';
+                if (region === 'OC') continentKey = 'Oceania';
+
+                const localData = speciesDB[continentKey] || speciesDB['Default'];
+
+                // Update Stats (Simulated Local Data)
+                const localEndangered = Math.floor(Math.random() * (50 - 5) + 5);
+                const localForest = (Math.random() * (45 - 5) + 5).toFixed(1);
+                const localProtected = Math.floor(Math.random() * (12 - 1) + 1);
+
+                document.getElementById('label-species').textContent = `Endangered in ${country}`;
+                document.getElementById('val-species').textContent = localEndangered + " Species";
+
+                document.getElementById('label-forest').textContent = `${data.region_code || 'Region'} Green Cover`;
+                document.getElementById('val-forest').textContent = localForest + "%";
+                document.getElementById('meta-forest').textContent = localForest > 25 ? 'Above Avg' : 'Below Avg';
+
+                document.getElementById('label-protected').textContent = "Nearby Sanctuaries";
+                document.getElementById('val-protected').textContent = localProtected;
+                document.getElementById('meta-protected').textContent = "Within 100km radius";
+
+                document.getElementById('label-bird').textContent = "Native Birds";
+                document.getElementById('val-bird').textContent = "~" + Math.floor(Math.random() * (300 - 50) + 50);
+
+                // Update Spotlight
+                document.getElementById('species-name').textContent = localData.name;
+                document.getElementById('species-img').src = localData.img;
+                document.getElementById('species-desc').textContent = localData.desc;
+                document.querySelector('.badge').textContent = localData.risk;
+
+                // Re-render chart with slightly randomized "local" distribution
+                speciesChart.data.datasets[0].data = [
+                    Math.floor(Math.random() * 60),
+                    Math.floor(Math.random() * 20),
+                    Math.floor(Math.random() * 20),
+                    Math.floor(Math.random() * 10),
+                    Math.floor(Math.random() * 5)
+                ];
+                speciesChart.update();
+
+            })
+            .catch(err => console.log(err));
+    });
+</script>
+
+<style>
+    .dashboard-container {
+        padding: 4rem 5%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stat-info h3 {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-bottom: 0.2rem;
+    }
+
+    .stat-info .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .stat-info .stat-meta {
+        font-size: 0.75rem;
+        color: #7f8c8d;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .chart-box,
+    .spotlight-box {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .spotlight-box h3 {
+        margin-bottom: 1rem;
+        color: #d35400;
+    }
+
+    .species-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .species-info h4 {
+        font-size: 1.3rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+    }
+
+    .badge.danger {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .btn-micro {
+        display: inline-block;
+        margin-top: 1rem;
+        background: #f09819;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .gallery h2 {
+        margin-bottom: 2rem;
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    .gallery-item {
+        height: 200px;
+        border-radius: 12px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+    }
+
+    .gallery-item span {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+        color: white;
+        font-weight: 600;
+    }
+
+    @media (max-width: 768px) {
+
+        .content-grid,
+        .gallery-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

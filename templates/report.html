@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Report Issue - EcoPortal{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Report an Issue</h1>
+    <p>Help us identify environmental hazards in your area.</p>
+    <div style="margin-top: 1rem;">
+        <a href="{{ url_for('my_reports') }}"
+            style="display: inline-block; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); color: white; border-radius: 20px; text-decoration: none; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.4); transition: all 0.3s;">
+            <i class="fas fa-history"></i> View Submitted Reports
+        </a>
+    </div>
+</section>
+
+<div class="form-container">
+    <div class="form-box">
+        <form action="{{ url_for('report') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" value="{{ current_user.full_name }}" readonly>
+                </div>
+                <div class="form-group half">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="{{ current_user.email }}" readonly>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="location">Location</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="location" name="location" placeholder="e.g. Central Park, NY" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="issue_type">Issue Type</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <select id="issue_type" name="issue_type" required>
+                        <option value="" disabled selected>Select an issue type</option>
+                        <option value="Air Pollution">Air Pollution</option>
+                        <option value="Water Pollution">Water Pollution</option>
+                        <option value="Deforestation">Deforestation</option>
+                        <option value="Waste Management">Waste Management</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="5" placeholder="Describe the issue in detail..."
+                    required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="image">Upload Image (Optional)</label>
+                <div class="file-upload">
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <p class="file-info">Click to upload or drag and drop</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary btn-block">Submit Report</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

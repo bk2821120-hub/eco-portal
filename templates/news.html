@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}News - EcoPortal{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Latest Environmental News & Updates</h1>
+    <p>Stay updated with what's happening around our planet.</p>
+</section>
+
+<section class="news-container">
+    <div class="news-grid">
+        {% for item in news %}
+        <div class="news-card">
+            <div class="news-image">
+                <!-- Using placeholder images for demo purposes -->
+                <div class="image-placeholder"
+                    style="background-color: #e0f2f1; height: 200px; display: flex; align-items: center; justify-content: center; color: #00695c;">
+                    <i class="fas fa-image fa-3x"></i>
+                </div>
+            </div>
+            <div class="news-content">
+                <span class="news-category">{{ item.category }}</span>
+                <h3>{{ item.title }}</h3>
+                <span class="news-date"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
+                <p>{{ item.description }}</p>
+                <a href="#" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

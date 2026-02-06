@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+
+{% block title %}Pollution Control - EcoPortal{% endblock %}
+
+{% block content %}
+<section class="page-header" style="background: linear-gradient(135deg, #11998e, #38ef7d); color: white;">
+    <h1>Pollution Control Monitor</h1>
+    <p>Tracking air, water, and plastic pollution levels globally.</p>
+</section>
+
+<div class="dashboard-container">
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #6c757d; background: #e9ecef;"><i class="fas fa-smog"></i></div>
+            <div class="stat-info">
+                <h3 id="label-aqi">Global AQI (Avg)</h3>
+                <p class="stat-value" id="val-aqi">72</p>
+                <span class="stat-meta" id="meta-aqi">Moderate Risk</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #d63384; background: #fce4ec;"><i class="fas fa-trash-alt"></i></div>
+            <div class="stat-info">
+                <h3 id="label-waste">Daily Waste</h3>
+                <p class="stat-value" id="val-waste">14k Tons</p>
+                <span class="stat-meta" id="meta-waste">Global Avg</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #0dcaf0; background: #cff4fc;"><i class="fas fa-tint"></i></div>
+            <div class="stat-info">
+                <h3 id="label-water">Water Quality</h3>
+                <p class="stat-value" id="val-water">Good</p>
+                <span class="stat-meta" id="meta-water">Index: 85/100</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="color: #198754; background: #d1e7dd;"><i class="fas fa-recycle"></i></div>
+            <div class="stat-info">
+                <h3 id="label-recycle">Recycling Rate</h3>
+                <p class="stat-value" id="val-recycle">32%</p>
+                <span class="stat-meta" id="meta-recycle">National Avg</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Banner -->
+    <div id="location-banner"
+        style="background: rgba(0,0,0,0.05); padding: 1rem; border-radius: 10px; text-align: center; margin-bottom: 2rem; display: none;">
+        <p><i class="fas fa-map-marker-alt" style="color: #e74c3c;"></i> Showing pollution data for <strong
+                id="detected-location">...</strong></p>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-container">
+        <div class="chart-box">
+            <h3>Waste Composition (<span id="chart-loc-1">Global</span>)</h3>
+            <canvas id="wasteChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>Air Pollution Trend (<span id="chart-loc-2">Global</span>)</h3>
+            <canvas id="airChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Action Section -->
+    <div class="action-box">
+        <h2>Reduce Your Footprint</h2>
+        <div class="tips-grid">
+            <div class="tip-card">
+                <i class="fas fa-bicycle"></i>
+                <h4>Commute Green</h4>
+                <p>Cycle, walk, or use public transport to reduce emissions.</p>
+            </div>
+            <div class="tip-card">
+                <i class="fas fa-shopping-bag"></i>
+                <h4>Say No to Plastic</h4>
+                <p>Use reusable bags and bottles to cut down plastic waste.</p>
+            </div>
+            <div class="tip-card">
+                <i class="fas fa-lightbulb"></i>
+                <h4>Save Energy</h4>
+                <p>Switch to LEDs and turn off appliances when not in use.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Charts with Global Data first
+        const ctxWaste = document.getElementById('wasteChart').getContext('2d');
+        const wasteChart = new Chart(ctxWaste, {
+            type: 'doughnut',
+            data: {
+                labels: ['Organic', 'Paper', 'Plastic', 'Glass', 'Metal', 'Other'],
+                datasets: [{
+                    data: [44, 17, 12, 5, 4, 18],
+                    backgroundColor: ['#81c784', '#fff176', '#e57373', '#ba68c8', '#90a4ae', '#e0e0e0'],
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        const ctxAir = document.getElementById('airChart').getContext('2d');
+        const airChart = new Chart(ctxAir, {
+            type: 'bar',
+            data: {
+                labels: ['2019', '2020', '2021', '2022', '2023'],
+                datasets: [{
+                    label: 'Avg PM2.5 Concentration (µg/m³)',
+                    data: [45, 38, 42, 44, 43],
+                    backgroundColor: '#607d8b',
+                    borderRadius: 5
+                }]
+            },
+            options: { responsive: true, scales: { y: { beginAtZero: true } }, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // Function to Fetch Location and Mock Local Data
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                const city = data.city || 'Your Area';
+                const region = data.region || 'Region';
+
+                // Update UI to show we found them
+                document.getElementById('detected-location').textContent = `${city}, ${region}`;
+                document.getElementById('location-banner').style.display = 'block';
+                document.getElementById('chart-loc-1').textContent = city;
+                document.getElementById('chart-loc-2').textContent = city;
+
+                // Simulate Local Data based on location (Randomized for demo)
+                const localAQI = Math.floor(Math.random() * (150 - 30) + 30);
+                const localRecycling = Math.floor(Math.random() * (60 - 10) + 10);
+                const localWasteIndex = (Math.random() * (1.5 - 0.5) + 0.5).toFixed(1); // kg per person
+
+                // Update AQI Card
+                document.getElementById('label-aqi').textContent = `${city} AQI`;
+                document.getElementById('val-aqi').textContent = localAQI;
+                let aqiStatus = 'Good';
+                let aqiColor = '#2ecc71';
+                if (localAQI > 50) { aqiStatus = 'Moderate'; aqiColor = '#f1c40f'; }
+                if (localAQI > 100) { aqiStatus = 'Unhealthy'; aqiColor = '#e74c3c'; }
+                document.getElementById('meta-aqi').textContent = aqiStatus;
+                document.getElementById('meta-aqi').style.color = aqiColor;
+
+                // Update Waste Card
+                document.getElementById('label-waste').textContent = 'Waste / Person';
+                document.getElementById('val-waste').textContent = `${localWasteIndex} kg`;
+                document.getElementById('meta-waste').textContent = 'Daily Avg in ' + city;
+
+                // Update Water Card
+                document.getElementById('label-water').textContent = 'Local Water Quality';
+                const waterIndex = Math.floor(Math.random() * 30 + 70); // 70-100
+                document.getElementById('val-water').textContent = waterIndex + '%';
+                document.getElementById('meta-water').textContent = 'Safety Index (High)';
+
+                // Update Recycling Card
+                document.getElementById('label-recycle').textContent = 'City Recycling Rate';
+                document.getElementById('val-recycle').textContent = `${localRecycling}%`;
+                document.getElementById('meta-recycle').textContent = localRecycling > 30 ? 'Above Avg' : 'Needs Improvement';
+
+                // Update Charts with "Local" noisy data
+                // Update Air Chart Data
+                airChart.data.datasets[0].data = [
+                    localAQI - 5, localAQI - 10, localAQI + 2, localAQI, localAQI + 5
+                ];
+                airChart.update();
+
+            })
+            .catch(error => {
+                console.log('Location fetch failed, showing global defaults.');
+            });
+    });
+</script>
+
+<style>
+    .dashboard-container {
+        padding: 4rem 5%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stat-info h3 {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-bottom: 0.2rem;
+    }
+
+    .stat-info .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .stat-info .stat-meta {
+        font-size: 0.75rem;
+        color: #7f8c8d;
+    }
+
+    .charts-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .chart-box {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .chart-box h3 {
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+        text-align: center;
+    }
+
+    .action-box {
+        background: #f8f9fa;
+        padding: 3rem;
+        border-radius: 20px;
+        text-align: center;
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .tip-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .tip-card i {
+        font-size: 2.5rem;
+        color: #38ef7d;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}

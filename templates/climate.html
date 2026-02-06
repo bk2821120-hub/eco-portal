@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block title %}Climate Monitor - EcoPortal{% endblock %}
+
+{% block content %}
+<section class="page-header" style="background: linear-gradient(135deg, #FF512F, #DD2476); color: white;">
+    <h1>Global Climate Monitor</h1>
+    <p>Real-time simulated tracking of vital signs of our planet.</p>
+</section>
+
+<div class="climate-dashboard">
+    <!-- Quick Stats Row -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-temperature-high"></i></div>
+            <div class="stat-info">
+                <h3>Global Temp Rise</h3>
+                <p class="stat-value">+1.2°C</p>
+                <span class="stat-meta">Since pre-industrial era</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-cloud"></i></div>
+            <div class="stat-info">
+                <h3>CO2 Levels</h3>
+                <p class="stat-value">419 ppm</p>
+                <span class="stat-meta">Highest in 2 million years</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-water"></i></div>
+            <div class="stat-info">
+                <h3>Sea Level Rise</h3>
+                <p class="stat-value">3.4 mm/yr</p>
+                <span class="stat-meta">Accelerating annually</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-tree"></i></div>
+            <div class="stat-info">
+                <h3>Forest Loss</h3>
+                <p class="stat-value">10M ha</p>
+                <span class="stat-meta">Lost annually</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-container">
+        <div class="chart-box">
+            <h3>Global Temperature Anomaly (1880-2023)</h3>
+            <canvas id="tempChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h3>Carbon Dioxide (CO2) Levels</h3>
+            <canvas id="co2Chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Local Conditions Placeholder -->
+    <div class="local-weather-box">
+        <h2><i class="fas fa-map-marker-alt"></i> Local Climate Conditions</h2>
+        <p>Based on your simulated location: <strong>New York, USA</strong></p>
+        <div class="weather-grid">
+            <div class="weather-item">
+                <i class="fas fa-sun"></i>
+                <span>Status</span>
+                <strong>Sunny</strong>
+            </div>
+            <div class="weather-item">
+                <i class="fas fa-thermometer-half"></i>
+                <span>Temp</span>
+                <strong>24°C</strong>
+            </div>
+            <div class="weather-item">
+                <i class="fas fa-wind"></i>
+                <span>Wind</span>
+                <strong>12 km/h</strong>
+            </div>
+            <div class="weather-item">
+                <i class="fas fa-leaf"></i>
+                <span>AQI</span>
+                <strong style="color: #f1c40f;">45 (Good)</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize Charts (Global Data initially)
+        const ctxTemp = document.getElementById('tempChart').getContext('2d');
+        const tempChart = new Chart(ctxTemp, {
+            type: 'line',
+            data: {
+                labels: ['1880', '1900', '1920', '1940', '1960', '1980', '2000', '2023'],
+                datasets: [{
+                    label: 'Temperature Anomaly (°C)',
+                    data: [-0.16, -0.08, -0.27, 0.12, -0.03, 0.26, 0.54, 1.18],
+                    borderColor: '#FF5733',
+                    backgroundColor: 'rgba(255, 87, 51, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+
+        const ctxCO2 = document.getElementById('co2Chart').getContext('2d');
+        new Chart(ctxCO2, {
+            type: 'bar',
+            data: {
+                labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+                datasets: [{
+                    label: 'CO2 (ppm)',
+                    data: [408, 411, 414, 416, 418, 419],
+                    backgroundColor: '#3498db',
+                    borderRadius: 5
+                }]
+            },
+            options: { responsive: true, scales: { y: { min: 400 } }, plugins: { legend: { display: false } } }
+        });
+
+        // ----------------------------------------------------
+        // Real-Time Location & Weather Data Integration
+        // ----------------------------------------------------
+
+        // 1. Get Lat/Lon from IP
+        fetch('https://ipapi.co/json/')
+            .then(response => response.json())
+            .then(data => {
+                const city = data.city || 'Unknown Location';
+                const region = data.region || '';
+                const country = data.country_name || '';
+                const lat = data.latitude;
+                const lon = data.longitude;
+
+                // Update Location Text
+                const locationText = `${city}, ${country}`;
+                document.querySelector('.local-weather-box p strong').textContent = locationText;
+
+                // Update 'Global Climate Monitor' title to be local-aware
+                document.querySelector('.page-header p').textContent = `Real-time climate tracking for ${locationText} and the globe.`;
+
+                // 2. Fetch Live Weather from Open-Meteo API
+                if (lat && lon) {
+                    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m`)
+                        .then(res => res.json())
+                        .then(weatherData => {
+                            const current = weatherData.current_weather;
+
+                            // Update Weather Box
+                            document.querySelector('.weather-item:nth-child(2) strong').textContent = `${current.temperature}°C`;
+                            document.querySelector('.weather-item:nth-child(3) strong').textContent = `${current.windspeed} km/h`;
+
+                            // Interpret Weather Code
+                            const weatherCode = current.weathercode;
+                            let statusText = 'Fair';
+                            let iconClass = 'fa-sun';
+
+                            // Simple WMO code interpretation
+                            if (weatherCode <= 3) { statusText = 'Clear/Cloudy'; iconClass = 'fa-cloud-sun'; }
+                            else if (weatherCode <= 67) { statusText = 'Rainy'; iconClass = 'fa-cloud-rain'; }
+                            else if (weatherCode <= 77) { statusText = 'Snowy'; iconClass = 'fa-snowflake'; }
+                            else if (weatherCode > 80) { statusText = 'Stormy'; iconClass = 'fa-bolt'; }
+
+                            document.querySelector('.weather-item:nth-child(1) strong').textContent = statusText;
+                            document.querySelector('.weather-item:nth-child(1) i').className = `fas ${iconClass}`;
+
+                            // Calculate a 'Simulated' Local AQI based on random factor for demo (API requires key)
+                            const simulatedAQI = Math.floor(Math.random() * (80 - 20) + 20); // Generally good in this simulated world
+                            const aqiElement = document.querySelector('.weather-item:nth-child(4) strong');
+                            aqiElement.textContent = `${simulatedAQI} (Good)`;
+                            if (simulatedAQI > 50) { aqiElement.textContent = `${simulatedAQI} (Moderate)`; aqiElement.style.color = '#f1c40f'; }
+
+                            // Update Top Stats to be "Local" context where applicable
+                            document.querySelector('.stat-card:nth-child(1) h3').textContent = `Temp Anomaly (${city})`;
+                            // Compare local temp to a "historical average" (simulated: current - 1.5)
+                            const anomaly = (Math.random() * (2.0 - 0.5) + 0.5).toFixed(1);
+                            document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = `+${anomaly}°C`;
+                            document.querySelector('.stat-card:nth-child(1) .stat-meta').textContent = 'Above local historical avg';
+
+                        });
+                }
+            })
+            .catch(err => {
+                console.error("Failed to fetch location data", err);
+            });
+    });
+</script>
+
+<style>
+    .climate-dashboard {
+        padding: 4rem 5%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #f0f7ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #0288d1;
+    }
+
+    .stat-info h3 {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-bottom: 0.2rem;
+    }
+
+    .stat-info .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .stat-info .stat-meta {
+        font-size: 0.75rem;
+        color: #e74c3c;
+    }
+
+    .charts-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .chart-box {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .chart-box h3 {
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+    }
+
+    .local-weather-box {
+        background: linear-gradient(120deg, #89f7fe, #66a6ff);
+        padding: 3rem;
+        border-radius: 20px;
+        color: white;
+        text-align: center;
+    }
+
+    .local-weather-box h2 {
+        margin-bottom: 0.5rem;
+    }
+
+    .weather-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .weather-item {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 1.5rem;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        backdrop-filter: blur(5px);
+    }
+
+    .weather-item i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .charts-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

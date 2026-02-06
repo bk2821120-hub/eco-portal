@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - EcoPortal{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Contact Us</h1>
+    <p>We'd love to hear from you. Get in touch with us.</p>
+</section>
+
+<div class="contact-container">
+    <div class="contact-info">
+        <div class="info-card">
+            <i class="fas fa-envelope"></i>
+            <h3>Email</h3>
+            <p>support@ecoportal.com</p>
+        </div>
+        <div class="info-card">
+            <i class="fas fa-phone"></i>
+            <h3>Phone</h3>
+            <p>+1 234 567 890</p>
+        </div>
+        <div class="info-card">
+            <i class="fas fa-map-marker-alt"></i>
+            <h3>Address</h3>
+            <p>123 Green Street, Earth City, 10001</p>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <div class="form-box">
+            <h2>Send us a Message</h2>
+            <form action="{{ url_for('contact') }}" method="POST">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Your Email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" placeholder="What is this about?" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="5" placeholder="Write your message here..."
+                        required></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary btn-block">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Map Section -->
+    <div class="map-section" style="margin-top: 40px;">
+        <div class="map-search-box" style="margin-bottom: 1rem; display: flex; gap: 10px;">
+            <input type="text" id="location-input" placeholder="Enter a location..."
+                style="flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem;">
+            <button onclick="updateMap()" class="btn-primary"
+                style="padding: 12px 25px; cursor: pointer; border: none; background: #27ae60; color: white; border-radius: 5px; font-size: 1rem; font-weight: 600;">Find
+                Location</button>
+        </div>
+        <div class="map-container"
+            style="border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <iframe id="gmap_canvas"
+                src="https://maps.google.com/maps?q=Central%20Park&t=&z=13&ie=UTF8&iwloc=&output=embed" width="100%"
+                height="400" style="border:0;" allowfullscreen="" loading="lazy">
+            </iframe>
+        </div>
+        <script>
+            function updateMap() {
+                var input = document.getElementById('location-input').value;
+                var frame = document.getElementById('gmap_canvas');
+                if (input) {
+                    frame.src = "https://maps.google.com/maps?q=" + encodeURIComponent(input) + "&t=&z=13&ie=UTF8&iwloc=&output=embed";
+                }
+            }
+
+            // Allow 'Enter' key to search
+            document.getElementById('location-input').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    updateMap();
+                }
+            });
+        </script>
+    </div>
+</div>
+{% endblock %}

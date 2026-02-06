@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Environmental News Portal{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Protect Nature, <br><span class="highlight">Protect Future</span></h1>
+        <p>Stay informed about the environment, report local issues, and join the movement towards a sustainable future.
+            Awareness is the first step to change.</p>
+        <a href="{{ url_for('news') }}" class="btn-primary">Read Latest News</a>
+    </div>
+</section>
+
+<section class="features">
+    <h2 class="section-title">Key Focus Areas</h2>
+    <div class="feature-cards">
+        <a href="{{ url_for('climate') }}" class="card-link">
+            <div class="card">
+                <div class="icon-container">
+                    <i class="fas fa-temperature-high"></i>
+                </div>
+                <h3>Climate Change</h3>
+                <p>Understanding the global impact of rising temperatures and weather patterns.</p>
+            </div>
+        </a>
+        <a href="{{ url_for('pollution') }}" class="card-link">
+            <div class="card">
+                <div class="icon-container">
+                    <i class="fas fa-smog"></i>
+                </div>
+                <h3>Pollution Control</h3>
+                <p>Strategies and technologies to reduce waste and clean our air and water.</p>
+            </div>
+        </a>
+        <a href="{{ url_for('wildlife') }}" class="card-link">
+            <div class="card">
+                <div class="icon-container">
+                    <i class="fas fa-paw"></i>
+                </div>
+                <h3>Wildlife Protection</h3>
+                <p>Conserving biodiversity and protecting endangered species from extinction.</p>
+            </div>
+        </a>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>See Something Wrong?</h2>
+        <p>Report environmental issues in your area directly to us. We track and highlight community problems.</p>
+        <a href="{{ url_for('report') }}" class="btn-secondary">Report an Issue</a>
+    </div>
+</section>
+{% endblock %}
