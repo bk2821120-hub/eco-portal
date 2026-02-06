@@ -387,33 +387,11 @@ textarea {
     display: inline-block;
 }
 
-/* Contact & Report Forms */
-.form-container,
-.contact-container {
+/* Report Forms */
+.form-container {
     padding: 4rem 5%;
     max-width: 1000px;
     margin: 0 auto;
-}
-
-.contact-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-    text-align: center;
-}
-
-.info-card {
-    background: var(--white);
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-sm);
-}
-
-.info-card i {
-    color: var(--primary-color);
-    font-size: 2rem;
-    margin-bottom: 1rem;
 }
 
 .form-box {
