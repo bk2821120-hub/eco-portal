@@ -152,46 +152,38 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+import feedparser
+import re
+
 @app.route('/news')
 def news():
-    # Mock data for news
-    news_items = [
-        {
-            'title': 'Global Summit on Climate Change Reaches New Agreement',
-            'date': '2023-10-25',
-            'description': 'World leaders have agreed to cut carbon emissions by 40%...',
-            'image': 'climate_summit.jpg',
-            'category': 'Climate Change'
-        },
-        {
-            'title': 'New Ocean Cleaning Technology Deployed',
-            'date': '2023-10-22',
-            'description': 'A massive floating barrier is set to clean up the Great Pacific Garbage Patch...',
-            'image': 'ocean_cleanup.jpg',
-            'category': 'Pollution Control'
-        },
-        {
-            'title': 'Endangered Tiger Population Sees Increase',
-            'date': '2023-10-20',
-            'description': 'Conservation efforts have led to a 10% rise in the wild tiger population...',
-            'image': 'tiger.jpg',
-            'category': 'Wildlife Protection'
-        },
-        {
-            'title': 'Solar Power Adoption Hits Record High',
-            'date': '2023-10-18',
-            'description': 'Renewable energy sources are now providing more power than coal...',
-            'image': 'solar_panels.jpg',
-            'category': 'Renewable Energy'
-        },
-        {
-            'title': 'City Bans Single-Use Plastics',
-            'date': '2023-10-15',
-            'description': 'Major metropolitan area implements strict ban on plastic bags and straws...',
-            'image': 'plastic_ban.jpg',
-            'category': 'Pollution'
-        }
+    # RSS Feeds for Environmental News
+    feeds = [
+        "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml",
+        "https://www.sciencedaily.com/rss/earth_climate/environmental_science.xml",
+        "https://www.theguardian.com/environment/rss"
     ]
+    
+    news_items = []
+    
+    for url in feeds:
+        try:
+            feed = feedparser.parse(url)
+            for entry in feed.entries[:5]: # Take top 5 from each feed
+                # Strip HTML tags from summary if they exist
+                summary = re.sub('<[^<]+?>', '', entry.summary) if 'summary' in entry else ""
+                
+                news_items.append({
+                    'title': entry.title,
+                    'date': entry.published if 'published' in entry else "Recent",
+                    'description': summary[:200] + "...",
+                    'link': entry.link,
+                    'category': feed.feed.title if 'title' in feed.feed else 'Environment'
+                })
+        except Exception as e:
+            print(f"Error fetching feed {url}: {e}")
+            
+    # Sort by date if possible, but for now just reverse to see newest first
     return render_template('news.html', news=news_items)
 
 @app.route('/report', methods=['GET', 'POST'])
