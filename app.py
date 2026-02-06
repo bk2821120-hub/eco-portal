@@ -153,46 +153,77 @@ def logout():
 
 @app.route('/news')
 def news():
-    # Educational Environmental feeds
+    # Elite Educational Sources for EcoPortal
     feeds = [
         ("https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", "Climate Change"),
         ("https://www.sciencedaily.com/rss/earth_climate/environmental_science.xml", "Green Tech"),
-        ("https://news.google.com/rss/search?q=pollution+awareness+india&hl=en-IN&gl=IN&ceid=IN:en", "Pollution")
+        ("https://news.google.com/rss/search?q=pollution+awareness+india&hl=en-IN&gl=IN&ceid=IN:en", "Pollution"),
+        ("https://news.google.com/rss/search?q=wildlife+conservation+India&hl=en-IN&gl=IN&ceid=IN:en", "Wildlife")
     ]
     
     educational_news = []
     
+    # Category-based learning data
+    learning_repo = {
+        "Climate Change": {
+            "exp": "Climate change is caused by the increase of greenhouse gases like CO2 in our atmosphere, which trap heat and warm the planet. This leads to melting ice caps and rising sea levels.",
+            "impact": "Global warming disrupts weather patterns, causing extreme heatwaves, floods, and droughts that threaten food security and human health.",
+            "tip": "Reduce your carbon footprint by using public transport, saving electricity, and planting local trees."
+        },
+        "Pollution": {
+            "exp": "Pollution occurs when harmful substances (pollutants) are introduced into our environment. This can affect the air we breathe, the water we drink, and the soil where we grow food.",
+            "impact": "Pollution causes respiratory diseases in humans and destroys aquatic life. Plastic waste in oceans takes hundreds of years to decompose.",
+            "tip": "Say no to single-use plastics, dispose of electronic waste properly, and support 'Swachh Bharat' initiatives."
+        },
+        "Wildlife": {
+            "exp": "Wildlife conservation is the practice of protecting animal species and their habitats. Biodiversity is essential for a healthy and balanced ecosystem.",
+            "impact": "Loss of species can lead to ecosystem collapse, affecting everything from pollination of crops to natural pest control.",
+            "tip": "Avoid products made from endangered animals, support local wildlife sanctuaries, and keep your surroundings eco-friendly."
+        },
+        "Green Tech": {
+            "exp": "Green technology involves using science and technology to create products and services that are environmentally friendly and sustainable.",
+            "impact": "Switching to solar and wind energy reduces our dependence on fossil fuels, significantly cutting down on air pollution and carbon emissions.",
+            "tip": "Switch to LED bulbs at home, use solar water heaters, and choose energy-efficient appliances."
+        }
+    }
+
     for url, category in feeds:
         try:
             feed = feedparser.parse(url)
             for entry in feed.entries[:2]:
-                # Get raw text and clean it
                 summary = entry.summary if 'summary' in entry else ""
                 raw_text = re.sub('<[^<]+?>', '', summary) if summary else entry.title
                 
+                # Fetch category data or use default
+                edu = learning_repo.get(category, {
+                    "exp": "This environmental update highlights the ongoing shifts in our planetary boundaries.",
+                    "impact": "Changes in our environment affect ecological stability and community health.",
+                    "tip": "Stay informed and participate in local environmental awareness programs."
+                })
+
                 educational_news.append({
                     'title': entry.title,
-                    'intro': raw_text[:200] + "...",
-                    'explanation': "This environmental update highlights critical shifts in our planetary boundaries. Scientific observation is key to understanding these changes and implementing sustainable mitigations.",
-                    'impact': "The impact of these findings directly relates to human health and ecological stability, requiring immediate policy and community-level attention.",
-                    'awareness': "Individuals can contribute by reducing their carbon footprint, staying informed through verified channels, and participating in local conservation efforts.",
-                    'conclusion': "Understanding our environment is the first step toward protecting it for future generations.",
+                    'intro': raw_text[:250] + "...",
+                    'explanation': edu['exp'],
+                    'impact': edu['impact'],
+                    'awareness': edu['tip'],
+                    'conclusion': "Together, stay informed and act responsibly for a sustainable future.",
                     'category': category,
                     'date': datetime.now().strftime("%d %B %Y"),
-                    'location': 'India' if 'India' in entry.title or 'India' in raw_text else 'Global'
+                    'location': 'India' if 'India' in entry.title or 'India' in raw_text else 'International'
                 })
         except Exception as e:
             app.logger.error(f"Educational Feed Error for {url}: {e}")
             
-    # Fallback if no news could be fetched
+    # Fallback if feeds fail
     if not educational_news:
         educational_news.append({
-            'title': "The Importance of Environmental Literacy",
-            'intro': "In today's rapidly changing world, understanding the environment is more critical than ever...",
-            'explanation': "Environmental literacy helps individuals understand the complex interactions between humans and the natural world.",
-            'impact': "Increased awareness leads to better policy decisions and improved conservation outcomes globally.",
-            'awareness': "You can start by following local environmental news and adopting zero-waste habits at home.",
-            'conclusion': "Education is the most powerful tool we have to change the world.",
+            'title': "Welcome to EcoPortal Education",
+            'intro': "We are currently updating our daily news feed. Please check back in a few minutes.",
+            'explanation': "EcoPortal aims to provide students with updated knowledge about climate action.",
+            'impact': "Environmental literacy is the foundation of a sustainable lifestyle.",
+            'awareness': "Explore our other sections like 'Report Issue' to help your local community.",
+            'conclusion': "Every small action for nature counts.",
             'category': "Awareness",
             'date': datetime.now().strftime("%d %B %Y"),
             'location': "Global"
