@@ -10,9 +10,10 @@ import feedparser
 import re
 import csv
 import socket
+import requests
 
-# Set global timeout for socket operations (like feed fetching)
-socket.setdefaulttimeout(15)
+# Set global timeout for socket operations
+socket.setdefaulttimeout(10)
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__, static_url_path='/static', static_folder='static', template_folder='templates')
@@ -211,43 +212,43 @@ def news():
         }
     }
 
-    # Fetch news with custom User-Agent to avoid blocking
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
     
     for url, category in feeds:
         try:
-            # We use feedparser directly but the global socket timeout handles hangs
-            feed = feedparser.parse(url, agent=headers['User-Agent'])
-            
-            if feed.bozo:
-                app.logger.warning(f"Feed parser bozo error for {url}: {feed.bozo_exception}")
-
-            # Take top 3 for search, or top 2 for default feeds
-            limit = 3 if query else 2
-            count = 0
-            for entry in feed.entries:
-                if count >= limit: break
+            # Use requests for better timeout control
+            response = requests.get(url, headers=headers, timeout=5)
+            if response.status_code == 200:
+                feed = feedparser.parse(response.content)
                 
-                summary = entry.summary if 'summary' in entry else ""
-                raw_text = re.sub('<[^<]+?>', '', summary) if summary else entry.title
-                
-                # Dynamic Logic to choose best educational content
-                category_key = category if category in learning_repo else ("Climate Change" if "climate" in entry.title.lower() else "India Environment")
-                edu = learning_repo.get(category_key, learning_repo["Climate Change"])
+                # Take top 3 for search, or top 2 for default feeds
+                limit = 3 if query else 2
+                count = 0
+                for entry in feed.entries:
+                    if count >= limit: break
+                    
+                    summary = entry.summary if 'summary' in entry else ""
+                    raw_text = re.sub('<[^<]+?>', '', summary) if summary else entry.title
+                    
+                    # Choose best educational content
+                    category_key = category if category in learning_repo else ("Climate Change" if "climate" in entry.title.lower() else "India Environment")
+                    edu = learning_repo.get(category_key, learning_repo["Climate Change"])
 
-                educational_news.append({
-                    'title': entry.title,
-                    'category': category_key,
-                    'intro': raw_text[:200] + "...",
-                    'explanation': edu['exp'],
-                    'impact': edu['impact'],
-                    'awareness': edu['tip'],
-                    'date': datetime.now().strftime("%d %B %Y"),
-                    'location': 'India' if 'India' in entry.title or 'india' in entry.title.lower() else 'Global'
-                })
-                count += 1
+                    educational_news.append({
+                        'title': entry.title,
+                        'category': category_key,
+                        'intro': raw_text[:200] + "...",
+                        'explanation': edu['exp'],
+                        'impact': edu['impact'],
+                        'awareness': edu['tip'],
+                        'date': datetime.now().strftime("%d %B %Y"),
+                        'location': 'India' if 'India' in entry.title or 'india' in entry.title.lower() else 'Global'
+                    })
+                    count += 1
+            else:
+                app.logger.warning(f"Feed error {response.status_code} for {url}")
         except Exception as e:
-            app.logger.error(f"Search/Feed Error for {url}: {e}")
+            app.logger.error(f"News Fetch Error for {url}: {e}")
             
     return render_template('news.html', news=educational_news, search_query=query)
 
