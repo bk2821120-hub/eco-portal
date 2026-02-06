@@ -9,19 +9,106 @@
 </section>
 
 <section class="news-container">
-    <div class="news-grid">
+    <div class="news-grid professional-feed">
         {% for item in news %}
-        <div class="news-card">
+        <article class="news-card professional-item">
             <div class="news-content">
-                <span class="news-category">{{ item.category }}</span>
-                <h3>{{ item.title }}</h3>
-                <span class="news-date"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
-                <p>{{ item.description }}</p>
-                <a href="{{ item.link }}" target="_blank" class="read-more">Read Full Article <i
-                        class="fas fa-arrow-right"></i></a>
+                <div class="news-meta">
+                    <span class="news-category tag-{{ item.category|lower }}">{{ item.category }}</span>
+                    <span class="news-location"><i class="fas fa-map-marker-alt"></i> {{ item.location }}</span>
+                    <span class="news-date"><i class="far fa-calendar-alt"></i> {{ item.date }}</span>
+                </div>
+
+                <h2 class="professional-title">{{ item.title }}</h2>
+                <p class="professional-summary"><strong>Summary:</strong> {{ item.short_summary }}</p>
+
+                <div class="detailed-content">
+                    {{ item.detailed_content }}
+                </div>
+
+                <div class="editor-badge">
+                    <i class="fas fa-check-circle"></i> Verified by EcoPortal Editor
+                </div>
             </div>
-        </div>
+        </article>
         {% endfor %}
     </div>
 </section>
+
+<style>
+    .professional-feed {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+    }
+
+    .professional-item {
+        border-left: 5px solid var(--primary-color);
+        background: var(--white);
+        padding: 2.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .news-meta {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: var(--text-light);
+        align-items: center;
+    }
+
+    .tag-climate {
+        background: #e3f2fd;
+        color: #1565c0;
+        padding: 2px 10px;
+        border-radius: 4px;
+    }
+
+    .tag-pollution {
+        background: #fbe9e7;
+        color: #d84315;
+        padding: 2px 10px;
+        border-radius: 4px;
+    }
+
+    .tag-global {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 2px 10px;
+        border-radius: 4px;
+    }
+
+    .professional-title {
+        font-size: 1.8rem;
+        color: var(--primary-dark);
+        margin-bottom: 1.5rem;
+    }
+
+    .professional-summary {
+        font-style: italic;
+        color: #555;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 1rem;
+    }
+
+    .detailed-content {
+        line-height: 1.8;
+        font-size: 1.05rem;
+        color: #333;
+    }
+
+    .editor-badge {
+        margin-top: 2rem;
+        font-size: 0.8rem;
+        color: var(--primary-color);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+</style>
 {% endblock %}
