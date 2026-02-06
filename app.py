@@ -9,14 +9,16 @@ import mimetypes
 mimetypes.add_type('text/css', '.css')
 mimetypes.add_type('application/javascript', '.js')
 
-# Create instance folder if it doesn't exist
-if not os.path.exists('instance'):
-    os.makedirs('instance')
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__, static_url_path='/static', static_folder='static', template_folder='templates')
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-key-for-dev')
 # Use absolute path for database to avoid issues in production
 basedir = os.path.abspath(os.path.dirname(__file__))
+if not os.path.exists(os.path.join(basedir, 'instance')):
+    os.makedirs(os.path.join(basedir, 'instance'))
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -24,6 +26,18 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+@app.errorhandler(500)
+def handle_500(e):
+    return f"Internal Server Error: {str(e)}", 500
+
+@app.route('/debug-info')
+def debug_info():
+    return {
+        "cwd": os.getcwd(),
+        "instance_exists": os.path.exists('instance'),
+        "db_uri": app.config['SQLALCHEMY_DATABASE_URI']
+    }
 
 # Models
 class User(UserMixin, db.Model):
