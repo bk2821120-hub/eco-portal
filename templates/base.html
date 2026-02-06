@@ -52,13 +52,7 @@
     <nav class="navbar">
         <div class="logo">
             <a href="{{ url_for('home') }}">
-                <div class="logo-wrapper">
-                    <div class="logo-icon">
-                        <i class="fas fa-leaf"></i>
-                        <i class="fas fa-tint"></i>
-                    </div>
-                    <span class="logo-text">Eco<span>Portal</span></span>
-                </div>
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EcoPortal Logo" class="brand-logo">
             </a>
         </div>
         <ul class="nav-links">
