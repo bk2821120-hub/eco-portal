@@ -55,22 +55,52 @@ ul {
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.logo a {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--primary-color);
+.logo-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
-    letter-spacing: -0.5px;
+    gap: 12px;
 }
 
-.logo i {
-    font-size: 1.6rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+.logo-icon {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-icon .fa-leaf {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #2e7d32, #8bc34a);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    z-index: 2;
+}
+
+.logo-icon .fa-tint {
+    position: absolute;
+    font-size: 1rem;
+    color: var(--secondary-color);
+    bottom: -2px;
+    right: -2px;
+    z-index: 3;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.logo-text {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-text span {
+    color: var(--secondary-color);
+    font-weight: 400;
 }
 
 .nav-links {

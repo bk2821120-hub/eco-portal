@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,7 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         /* Flash Message styling embedded just in case css fails to load initially, or for easy dynamic handling */
         .flash-messages {
@@ -17,29 +18,48 @@
             right: 20px;
             z-index: 1000;
         }
+
         .flash-message {
             background: white;
             padding: 15px 25px;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 10px;
             border-left: 5px solid #2ecc71;
             animation: slideIn 0.5s ease-out forwards;
         }
+
         .flash-message.error {
             border-left-color: #e74c3c;
         }
+
         @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
+
 <body>
-    
+
     <nav class="navbar">
         <div class="logo">
-            <a href="{{ url_for('home') }}"><i class="fas fa-leaf"></i> EcoPortal</a>
+            <a href="{{ url_for('home') }}">
+                <div class="logo-wrapper">
+                    <div class="logo-icon">
+                        <i class="fas fa-leaf"></i>
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <span class="logo-text">Eco<span>Portal</span></span>
+                </div>
+            </a>
         </div>
         <ul class="nav-links">
             <li><a href="{{ url_for('home') }}">Home</a></li>
@@ -47,9 +67,9 @@
             <li><a href="{{ url_for('report') }}">Report Issue</a></li>
             <li><a href="{{ url_for('contact') }}">Contact</a></li>
             {% if current_user.is_authenticated %}
-                <li><a href="{{ url_for('logout') }}" class="btn-nav">Logout</a></li>
+            <li><a href="{{ url_for('logout') }}" class="btn-nav">Logout</a></li>
             {% else %}
-                <li><a href="{{ url_for('login') }}" class="btn-nav">Login</a></li>
+            <li><a href="{{ url_for('login') }}" class="btn-nav">Login</a></li>
             {% endif %}
         </ul>
         <div class="hamburger">
@@ -61,13 +81,13 @@
 
     <div class="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash-message {{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
     </div>
 
@@ -79,7 +99,8 @@
         <div class="footer-content">
             <div class="footer-section about">
                 <h2>EcoPortal</h2>
-                <p>Protect Nature, Protect Future. Join us in our mission to create a sustainable world for generations to come.</p>
+                <p>Protect Nature, Protect Future. Join us in our mission to create a sustainable world for generations
+                    to come.</p>
             </div>
             <div class="footer-section links">
                 <h3>Quick Links</h3>
@@ -103,4 +124,5 @@
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>
