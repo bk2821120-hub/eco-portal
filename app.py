@@ -162,31 +162,20 @@ def news():
     
     # Base feeds + dynamic search if query exists
     if query:
-        # Search-specific feed using Google News RSS
+        # Search-specific feed
         search_query = f"{query} environment climate sustainability India"
         feeds = [(f"https://news.google.com/rss/search?q={search_query}&hl=en-IN&gl=IN&ceid=IN:en", "Search Result")]
     else:
-        # Default elite sources
+        # Elite sources requested by you: The Hindu, NatGeo, UNEP, NASA, Indian Express
         feeds = [
-            ("https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", "Climate Change"),
-            ("https://www.sciencedaily.com/rss/earth_climate/environmental_science.xml", "Green Tech"),
-            ("https://news.google.com/rss/search?q=pollution+awareness+india&hl=en-IN&gl=IN&ceid=IN:en", "India Environment"),
-            ("https://news.google.com/rss/search?q=wildlife+conservation+India&hl=en-IN&gl=IN&ceid=IN:en", "Wildlife")
+            ("https://news.google.com/rss/search?q=site:thehindu.com+environment&hl=en-IN&gl=IN&ceid=IN:en", "India Environment"),
+            ("https://news.google.com/rss/search?q=site:nationalgeographic.com+environment+wildlife&hl=en-US&gl=US&ceid=US:en", "Wildlife"),
+            ("https://news.google.com/rss/search?q=site:unep.org+news&hl=en-US&gl=US&ceid=US:en", "Global Policy"),
+            ("https://news.google.com/rss/search?q=site:climate.nasa.gov+news&hl=en-US&gl=US&ceid=US:en", "Climate Science"),
+            ("https://news.google.com/rss/search?q=site:indianexpress.com+environment&hl=en-IN&gl=IN&ceid=IN:en", "India News")
         ]
     
     educational_news = []
-    
-    # HARDCODED TEST ITEM TO VERIFY DEPLOYMENT
-    educational_news.append({
-        'title': "DEPLOYMENT VERIFICATION: EcoPortal Educator Active",
-        'category': "System",
-        'intro': "This is a verification message to confirm the latest code is live.",
-        'explanation': "The educational engine is now processing global news feeds successfully.",
-        'impact': "Users can now search and study environmental topics internally.",
-        'awareness': "Search for any topic using the bar above.",
-        'date': datetime.now().strftime("%d %B %Y"),
-        'location': "Live Server"
-    })
     
     # Category-based learning database for educational expansion
     learning_repo = {
