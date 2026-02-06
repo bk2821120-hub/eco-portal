@@ -60,13 +60,6 @@ class Issue(db.Model):
     image_filename = db.Column(db.String(100), nullable=True)
     date_reported = db.Column(db.DateTime, default=datetime.utcnow)
 
-class ContactMessage(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
-    subject = db.Column(db.String(100), nullable=False)
-    message = db.Column(db.Text, nullable=False)
-    date_sent = db.Column(db.DateTime, default=datetime.utcnow)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -284,26 +277,6 @@ def my_reports():
     return render_template('my_reports.html', reports=user_reports)
 
 
-@app.route('/contact', methods=['GET', 'POST'])
-def contact():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        subject = request.form.get('subject')
-        message = request.form.get('message')
-        
-        new_msg = ContactMessage(
-            name=name,
-            email=email,
-            subject=subject,
-            message=message
-        )
-        db.session.add(new_msg)
-        db.session.commit()
-        flash('Message sent successfully! We will get back to you soon.', 'success')
-        return redirect(url_for('contact'))
-        
-    return render_template('contact.html')
 
 @app.route('/climate')
 def climate():

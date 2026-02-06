@@ -59,7 +59,6 @@
             <li><a href="{{ url_for('home') }}">Home</a></li>
             <li><a href="{{ url_for('news') }}">News</a></li>
             <li><a href="{{ url_for('report') }}">Report Issue</a></li>
-            <li><a href="{{ url_for('contact') }}">Contact</a></li>
             {% if current_user.is_authenticated %}
             <li><a href="{{ url_for('logout') }}" class="btn-nav">Logout</a></li>
             {% else %}
@@ -102,13 +101,7 @@
                     <li><a href="{{ url_for('home') }}">Home</a></li>
                     <li><a href="{{ url_for('news') }}">Latest News</a></li>
                     <li><a href="{{ url_for('report') }}">Report Issue</a></li>
-                    <li><a href="{{ url_for('contact') }}">Contact Us</a></li>
                 </ul>
-            </div>
-            <div class="footer-section contact">
-                <h3>Contact Us</h3>
-                <p><i class="fas fa-envelope"></i> info@ecoportal.com</p>
-                <p><i class="fas fa-phone"></i> +1 234 567 890</p>
             </div>
         </div>
         <div class="footer-bottom">
