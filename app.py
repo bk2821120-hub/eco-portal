@@ -175,6 +175,18 @@ def news():
     
     educational_news = []
     
+    # HARDCODED TEST ITEM TO VERIFY DEPLOYMENT
+    educational_news.append({
+        'title': "DEPLOYMENT VERIFICATION: EcoPortal Educator Active",
+        'category': "System",
+        'intro': "This is a verification message to confirm the latest code is live.",
+        'explanation': "The educational engine is now processing global news feeds successfully.",
+        'impact': "Users can now search and study environmental topics internally.",
+        'awareness': "Search for any topic using the bar above.",
+        'date': datetime.now().strftime("%d %B %Y"),
+        'location': "Live Server"
+    })
+    
     # Category-based learning database for educational expansion
     learning_repo = {
         "Climate Change": {
