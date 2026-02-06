@@ -5,11 +5,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from datetime import datetime
 import mimetypes
-
-mimetypes.add_type('text/css', '.css')
-mimetypes.add_type('application/javascript', '.js')
-
 import logging
+import feedparser
+import re
+import csv
 logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__, static_url_path='/static', static_folder='static', template_folder='templates')
@@ -152,16 +151,12 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-import feedparser
-import re
-
 @app.route('/news')
 def news():
-    # Structured sources for educational content
+    # Educational Environmental feeds
     feeds = [
         ("https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", "Climate Change"),
         ("https://www.sciencedaily.com/rss/earth_climate/environmental_science.xml", "Green Tech"),
-        ("https://www.downtoearth.org.in/rss/environment", "India/Wildlife"),
         ("https://news.google.com/rss/search?q=pollution+awareness+india&hl=en-IN&gl=IN&ceid=IN:en", "Pollution")
     ]
     
@@ -170,24 +165,38 @@ def news():
     for url, category in feeds:
         try:
             feed = feedparser.parse(url)
-            for entry in feed.entries[:2]: # 2 high-quality items per feed
-                raw_text = re.sub('<[^<]+?>', '', entry.summary) if 'summary' in entry else entry.title
+            for entry in feed.entries[:2]:
+                # Get raw text and clean it
+                summary = entry.summary if 'summary' in entry else ""
+                raw_text = re.sub('<[^<]+?>', '', summary) if summary else entry.title
                 
-                # EcoPortal Educator Logic: Structuring raw news into educational modules
-                item = {
+                educational_news.append({
                     'title': entry.title,
-                    'intro': raw_text[:150] + "...",
-                    'explanation': "Environmental scientists emphasize that these findings are crucial for understanding how local ecosystems respond to global pressure. The data suggests an urgent need for revised sustainability protocols.",
-                    'impact': "The primary impact of this development involves a shift in biodiversity patterns and potential long-term changes to air and water quality in affected regions.",
-                    'awareness': "Individuals can contribute by staying informed, reducing waste, and supporting local conservation policies that prioritize ecological health.",
-                    'conclusion': "A proactive approach today ensures a cleaner, greener tomorrow for the upcoming generation.",
+                    'intro': raw_text[:200] + "...",
+                    'explanation': "This environmental update highlights critical shifts in our planetary boundaries. Scientific observation is key to understanding these changes and implementing sustainable mitigations.",
+                    'impact': "The impact of these findings directly relates to human health and ecological stability, requiring immediate policy and community-level attention.",
+                    'awareness': "Individuals can contribute by reducing their carbon footprint, staying informed through verified channels, and participating in local conservation efforts.",
+                    'conclusion': "Understanding our environment is the first step toward protecting it for future generations.",
                     'category': category,
                     'date': datetime.now().strftime("%d %B %Y"),
-                    'location': 'India' if 'India' in entry.title or 'India' in raw_text else 'International'
-                }
-                educational_news.append(item)
+                    'location': 'India' if 'India' in entry.title or 'India' in raw_text else 'Global'
+                })
         except Exception as e:
-            print(f"Educational Feed Error: {e}")
+            app.logger.error(f"Educational Feed Error for {url}: {e}")
+            
+    # Fallback if no news could be fetched
+    if not educational_news:
+        educational_news.append({
+            'title': "The Importance of Environmental Literacy",
+            'intro': "In today's rapidly changing world, understanding the environment is more critical than ever...",
+            'explanation': "Environmental literacy helps individuals understand the complex interactions between humans and the natural world.",
+            'impact': "Increased awareness leads to better policy decisions and improved conservation outcomes globally.",
+            'awareness': "You can start by following local environmental news and adopting zero-waste habits at home.",
+            'conclusion': "Education is the most powerful tool we have to change the world.",
+            'category': "Awareness",
+            'date': datetime.now().strftime("%d %B %Y"),
+            'location': "Global"
+        })
             
     return render_template('news.html', news=educational_news)
 
